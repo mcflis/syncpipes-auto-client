@@ -1,0 +1,23 @@
+# EditorConfig: http://EditorConfig.org
+# EditorConfig Properties: https://github.com/editorconfig/editorconfig/wiki/EditorConfig-Properties
+
+# top-most EditorConfig file
+root = true
+
+### defaults
+[*]
+indent_size = 2
+indent_style = space
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 200
+quote_type = single
+
+### custom for markdown
+[*.md]
+trim_trailing_whitespace = false
+
+[*.json]
+max_line_length = off

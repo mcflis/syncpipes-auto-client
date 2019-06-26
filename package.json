@@ -1,0 +1,81 @@
+{
+  "name": "syncpipes-auto-client",
+  "version": "1.0.0",
+  "description": "Automation tool to interact with syncpipes-server api",
+  "main": "lib/index.js",
+  "watch": {
+    "build": {
+      "patterns": [
+        "src"
+      ],
+      "extensions": "ts,json",
+      "quiet": false
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf ./lib",
+    "build": "npm-run-all clean tsc",
+    "tsc": "tsc",
+    "watch": "npm-watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcflis/syncpipes-auto-client.git"
+  },
+  "keywords": [],
+  "author": "Maximilian Flis <maximilian.flis@sky.de>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mcflis/syncpipes-auto-client/issues"
+  },
+  "homepage": "https://github.com/mcflis/syncpipes-auto-client#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "1.9.0",
+    "@typescript-eslint/parser": "1.9.0",
+    "eslint": "5.16.0",
+    "eslint-config-prettier": "4.3.0",
+    "eslint-plugin-prettier": "3.1.0",
+    "husky": "2.4.0",
+    "lint-staged": "8.2.0",
+    "npm-run-all": "4.1.5",
+    "npm-watch": "0.6.0",
+    "prettier": "1.18.0",
+    "rimraf": "2.6.3",
+    "typescript": "3.5.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsc --noEmit && rimraf ./lib/test && lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "all",
+    "singleQuote": true,
+    "printWidth": 200,
+    "tabWidth": 2
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "plugin:@typescript-eslint/recommended",
+      "prettier/@typescript-eslint",
+      "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module"
+    },
+    "rules": {},
+    "plugins": [
+      "@typescript-eslint/eslint-plugin"
+    ]
+  }
+}
