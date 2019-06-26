@@ -9,10 +9,19 @@ app.get('/health', (req, res) => res.json({ message: 'ok' }));
 app.post('/start', (req, res, next) => next(new ServerError(400, 'Missing pipeline id')));
 app.post('/start/:pipelineId', (req, res, next) => {
   try {
-    jobs.add(req.params.pipelineId, '0 */2 * * * *', jobs.runPipeline.bind(null, req.params.pipelineId));
+    jobs.add(req.params.pipelineId, '*/30 * * * * *', jobs.runPipeline.bind(null, req.params.pipelineId));
     res.status(204).send();
   } catch (e) {
     next(new ServerError(400, e.toString()));
+  }
+});
+app.post('/stop', (req, res, next) => next(new ServerError(400, 'Missing pipeline id')));
+app.post('/stop/:pipelineId', (req, res, next) => {
+  try {
+    jobs.remove(req.params.pipelineId);
+    res.status(204).send();
+  } catch (e) {
+    next(new ServerError(404, `Job with id ${req.params.pipelineId} not found.`));
   }
 });
 app.all('*', (req: Request, res, next) => next(new ServerError(404, `${req.method} ${req.path} not found`)));
