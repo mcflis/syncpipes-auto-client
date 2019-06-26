@@ -4,12 +4,13 @@ import * as jobs from './jobs';
 
 const app = express();
 const port = process.env.SYNCPIPES_AUTO_CLIENT_PORT || 3123;
+const cronTime = process.env.SYNCPIPES_AUTO_CLIENT_CRON_TIME || '0 */5 * * * *';
 
 app.get('/health', (req, res) => res.json({ message: 'ok' }));
 app.post('/start', (req, res, next) => next(new ServerError(400, 'Missing pipeline id')));
 app.post('/start/:pipelineId', (req, res, next) => {
   try {
-    jobs.add(req.params.pipelineId, '*/30 * * * * *', jobs.runPipeline.bind(null, req.params.pipelineId));
+    jobs.add(req.params.pipelineId, cronTime, jobs.runPipeline.bind(null, req.params.pipelineId));
     res.status(204).send();
   } catch (e) {
     next(new ServerError(400, e.toString()));
