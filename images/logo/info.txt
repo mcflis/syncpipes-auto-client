@@ -1,0 +1,14 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+
+font name: Changa-Regular
+font link: https://www.fontsquirrel.com/fonts/changa
+font author: Eduardo Tunni
+font author site: http://www.tipo.net.ar/
+
+icon designer: Carol Costa
+icon designer link: /carolcosta
+        
+{"bg":"#ffffff","icon-gradient-0":"#041804","icon-gradient-1":"#6FD2C4","font":"#000000"}
+      

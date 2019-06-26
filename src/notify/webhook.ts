@@ -26,7 +26,7 @@ export const getWebhook: Promise<IncomingWebhook> = new Promise<IncomingWebhook>
     );
   }
 
-  const service = new notifier.SlackNotifier({ name: 'syncpipes-auto-client' });
+  const service = new notifier.SlackNotifier({ name: 'syncpipes-auto-client', icon_emoji: ':syncpipes-auto-client:' });
   service.hook = hook.bind(service);
   notifier.attachService(service);
 });
