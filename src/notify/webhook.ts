@@ -1,6 +1,5 @@
 import { IncomingWebhook, IncomingWebhookResult, IncomingWebhookSendArguments } from '@slack/webhook';
-import * as notifier from '@sky-tech-tools/slack-webhook-notifier';
-import { SlackNotifier } from '@sky-tech-tools/slack-webhook-notifier';
+import { SlackNotifier } from '../types';
 
 const dummy: IncomingWebhook = Object.assign({
   send(): Promise<IncomingWebhookResult> {
@@ -10,23 +9,32 @@ const dummy: IncomingWebhook = Object.assign({
   },
 });
 
-export const getWebhook: Promise<IncomingWebhook> = new Promise<IncomingWebhook>(resolve => {
-  if (!process.env.SLACK_WEBHOOK_URL) {
-    resolve(dummy);
-  }
+export const getWebhook: Promise<IncomingWebhook> = (async function getWebhook(): Promise<IncomingWebhook> {
+  // @ts-ignore
+  const notifier = await import('@sky-tech-tools/slack-webhook-notifier').catch((err: Error) => {
+    console.warn(err.toString());
+  });
 
-  function hook(this: SlackNotifier, webhook: IncomingWebhook) {
-    const defaultOpts = this.getWebhookSendOpts();
-    resolve(
-      Object.assign({}, webhook, {
-        send(message: IncomingWebhookSendArguments): Promise<IncomingWebhookResult> {
-          return webhook.send({ ...defaultOpts, ...message });
-        },
-      }),
-    );
-  }
+  return new Promise<IncomingWebhook>(resolve => {
+    if (!process.env.SLACK_WEBHOOK_URL || !notifier) {
+      console.warn(`Notifier module not loaded or SLACK_WEBHOOK_URL environment var not set. Notifier functionality will be disabled.`);
+      resolve(dummy);
+      return;
+    }
 
-  const service = new notifier.SlackNotifier({ name: 'syncpipes-auto-client', icon_emoji: ':syncpipes-auto-client:' });
-  service.hook = hook.bind(service);
-  notifier.attachService(service);
-});
+    function hook(this: SlackNotifier, webhook: IncomingWebhook) {
+      const defaultOpts = this.getWebhookSendOpts();
+      resolve(
+        Object.assign({}, webhook, {
+          send(message: IncomingWebhookSendArguments): Promise<IncomingWebhookResult> {
+            return webhook.send({ ...defaultOpts, ...message });
+          },
+        }),
+      );
+    }
+
+    const service: SlackNotifier = new notifier.SlackNotifier({ name: 'syncpipes-auto-client', icon_emoji: ':syncpipes-auto-client:' });
+    service.hook = hook.bind(service);
+    notifier.attachService(service);
+  });
+})();
