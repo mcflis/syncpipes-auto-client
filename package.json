@@ -19,7 +19,7 @@
     "clean": "rimraf ./lib",
     "build": "npm-run-all clean tsc",
     "build:docker": "npm-run-all clean tsc:docker",
-    "build:docker:image": "node docker_build.js",
+    "build:docker:image": "node node_modules/@mcflis/node-docker-build-helper/docker_build.js",
     "tsc": "tsc",
     "tsc:docker": "tsc -p tsconfig.docker.json",
     "watch": "npm-watch"
@@ -44,6 +44,7 @@
     "express": "4.17.1"
   },
   "devDependencies": {
+    "@mcflis/node-docker-build-helper": "gist:e9ffc44cf3402ac684196865f87e5881",
     "@slack/webhook": "5.0.0",
     "@types/cron": "1.7.1",
     "@types/express": "4.17.0",
