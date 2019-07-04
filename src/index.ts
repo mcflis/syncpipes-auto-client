@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { ServerError } from './types';
 import * as jobs from './jobs';
 
@@ -8,12 +8,12 @@ const cronTime = process.env.SYNCPIPES_AUTO_CLIENT_CRON_TIME || '0 */5 * * * *';
 
 app.get('/health', (req, res) => res.json({ message: 'ok' }));
 app.post('/start', (req, res, next) => next(new ServerError(400, 'Missing pipeline id')));
-app.post('/start/:pipelineId', (req, res, next) => {
+app.post('/start/:pipelineId', (req, res) => {
   try {
     jobs.add(req.params.pipelineId, cronTime, jobs.runPipeline.bind(null, req.params.pipelineId));
     res.status(204).send();
   } catch (e) {
-    next(new ServerError(400, e.toString()));
+    res.status(200).json({ message: 'Job is already running' });
   }
 });
 app.post('/stop', (req, res, next) => next(new ServerError(400, 'Missing pipeline id')));
@@ -26,5 +26,5 @@ app.post('/stop/:pipelineId', (req, res, next) => {
   }
 });
 app.all('*', (req: Request, res, next) => next(new ServerError(404, `${req.method} ${req.path} not found`)));
-app.use((error: ServerError, req: Request, res: Response) => res.status(error.status).json({ message: error.message, status: error.status }));
+app.use((error: ServerError, req: Request, res: Response, next: NextFunction) => res.status(error.status).json({ message: error.message, status: error.status }));
 app.listen(port, () => console.log(`Syncpipes Auto Client listening on port ${port}!`));
