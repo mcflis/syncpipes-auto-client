@@ -26,5 +26,6 @@ app.post('/stop/:pipelineId', (req, res, next) => {
   }
 });
 app.all('*', (req: Request, res, next) => next(new ServerError(404, `${req.method} ${req.path} not found`)));
+// the fourth argument is required although it's not used. Express won't use this error handler if the fourth arg is missing.
 app.use((error: ServerError, req: Request, res: Response, next: NextFunction) => res.status(error.status).json({ message: error.message, status: error.status }));
 app.listen(port, () => console.log(`Syncpipes Auto Client listening on port ${port}!`));
