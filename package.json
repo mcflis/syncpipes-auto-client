@@ -1,6 +1,6 @@
 {
   "name": "syncpipes-auto-client",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Automation tool to interact with syncpipes-server api",
   "main": "lib/index.js",
   "watch": {
