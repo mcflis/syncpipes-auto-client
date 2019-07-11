@@ -19,7 +19,7 @@ export class Pipeline {
     this.execActionUri = `${this.uri}/actions/execute`;
     this.state = {
       messageAttachments: [],
-      lastExecutionStatus: PipelineExecutionStatus.NONE,
+      executionStatus: PipelineExecutionStatus.NONE,
     };
     this.name = axios({ method: 'get', url: this.uri })
       .then(res => res.data.name || this.id)
@@ -28,12 +28,18 @@ export class Pipeline {
 
   public async run(): Promise<AxiosResponse<PipelineExecutionActionResponse>> {
     if (await this.isRunning()) {
+      this.updateState({ executionStatus: PipelineExecutionStatus.SKIPPED });
       throw new Error(`Pipeline ${this.name} is already running`);
     }
-    return axios({ method: 'post', url: this.execActionUri }).then(res => {
-      this.updateState({ currentExecAction: res.data });
-      return res;
-    });
+    return axios({ method: 'post', url: this.execActionUri })
+      .then((res: AxiosResponse) => {
+        this.updateState({ currentExecAction: res.data, executionStatus: PipelineExecutionStatus.STARTED });
+        return res;
+      })
+      .catch((err: Error) => {
+        this.updateState({ executionStatus: PipelineExecutionStatus.FAILED });
+        throw err;
+      });
   }
 
   public async isRunning(): Promise<boolean> {

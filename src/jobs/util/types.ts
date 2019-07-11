@@ -27,5 +27,5 @@ export enum PipelineExecutionStatus {
 export interface PipelineState {
   currentExecAction?: PipelineExecutionActionResponse;
   messageAttachments: MessageAttachment[];
-  lastExecutionStatus: PipelineExecutionStatus;
+  executionStatus: PipelineExecutionStatus;
 }
