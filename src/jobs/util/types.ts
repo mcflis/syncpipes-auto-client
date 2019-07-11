@@ -1,3 +1,5 @@
+import { MessageAttachment } from './MessageAttachment';
+
 export interface PipelineOptions {
   baseUrl: string;
   id: string;
@@ -15,6 +17,15 @@ export interface PipelineExecutionResponse {
   status: string;
 }
 
+export enum PipelineExecutionStatus {
+  NONE,
+  STARTED,
+  FAILED,
+  SKIPPED,
+}
+
 export interface PipelineState {
   currentExecAction?: PipelineExecutionActionResponse;
+  messageAttachments: MessageAttachment[];
+  lastExecutionStatus: PipelineExecutionStatus;
 }

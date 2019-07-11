@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
-import { PipelineExecutionActionResponse, PipelineExecutionResponse, PipelineOptions, PipelineState } from './types';
+import { PipelineExecutionActionResponse, PipelineExecutionResponse, PipelineExecutionStatus, PipelineOptions, PipelineState } from './types';
+import { logger } from '../../logger';
 
 const pipelineRunStates = ['Running', 'Queued'];
 const pipelines: Map<string, Pipeline> = new Map<string, Pipeline>();
@@ -16,7 +17,10 @@ export class Pipeline {
     this.uri = `${opts.baseUrl}/pipelines/${this.id}`;
     this.execUri = `${opts.baseUrl}/pipeline-executions`;
     this.execActionUri = `${this.uri}/actions/execute`;
-    this.state = {};
+    this.state = {
+      messageAttachments: [],
+      lastExecutionStatus: PipelineExecutionStatus.NONE,
+    };
     this.name = axios({ method: 'get', url: this.uri })
       .then(res => res.data.name || this.id)
       .catch(() => this.id);
@@ -27,7 +31,7 @@ export class Pipeline {
       throw new Error(`Pipeline ${this.name} is already running`);
     }
     return axios({ method: 'post', url: this.execActionUri }).then(res => {
-      this.state.currentExecAction = res.data;
+      this.updateState({ currentExecAction: res.data });
       return res;
     });
   }
@@ -37,9 +41,17 @@ export class Pipeline {
       const res = await this.getCurrentPipelineExecution();
       return pipelineRunStates.includes(res.data.status);
     } catch (e) {
-      console.error(e.toString());
+      logger.warn(e.toString());
       return false;
     }
+  }
+
+  public getState(): PipelineState {
+    return this.state;
+  }
+
+  public updateState(state: Partial<PipelineState>): void {
+    this.state = Object.assign({}, this.state, state);
   }
 
   private getCurrentPipelineExecution(): Promise<AxiosResponse<PipelineExecutionResponse>> {

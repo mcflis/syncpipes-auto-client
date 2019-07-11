@@ -1,5 +1,6 @@
 import { IncomingWebhook, IncomingWebhookResult, IncomingWebhookSendArguments } from '@slack/webhook';
 import { SlackNotifier } from '../types';
+import { logger } from '../logger';
 
 const dummy: IncomingWebhook = Object.assign({
   send(): Promise<IncomingWebhookResult> {
@@ -12,12 +13,12 @@ const dummy: IncomingWebhook = Object.assign({
 export const getWebhook: Promise<IncomingWebhook> = (async function getWebhook(): Promise<IncomingWebhook> {
   // @ts-ignore
   const notifier = await import('@sky-tech-tools/slack-webhook-notifier').catch((err: Error) => {
-    console.warn(err.toString());
+    logger.warn(err.toString());
   });
 
   return new Promise<IncomingWebhook>(resolve => {
     if (!process.env.SLACK_WEBHOOK_URL || !notifier) {
-      console.warn(`Notifier module not loaded or SLACK_WEBHOOK_URL environment var not set. Notifier functionality will be disabled.`);
+      logger.warn(`Notifier module not loaded or SLACK_WEBHOOK_URL environment var not set. Notifier functionality will be disabled.`);
       resolve(dummy);
       return;
     }

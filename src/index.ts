@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { ServerError } from './types';
 import * as jobs from './jobs';
+import { logger } from './logger';
 
 const app = express();
 const port = process.env.SYNCPIPES_AUTO_CLIENT_PORT || 3123;
@@ -10,7 +11,11 @@ app.get('/health', (req, res) => res.json({ message: 'ok' }));
 app.post('/start', (req, res, next) => next(new ServerError(400, 'Missing pipeline id')));
 app.post('/start/:pipelineId', (req, res) => {
   try {
-    jobs.add(req.params.pipelineId, cronTime, jobs.runPipeline.bind(null, req.params.pipelineId));
+    jobs.add(req.params.pipelineId, cronTime, function() {
+      jobs.runPipeline(req.params.pipelineId).catch(err => {
+        logger.error(err);
+      });
+    });
     res.status(204).send();
   } catch (e) {
     res.status(200).json({ message: 'Job is already running' });
@@ -28,4 +33,4 @@ app.post('/stop/:pipelineId', (req, res, next) => {
 app.all('*', (req: Request, res, next) => next(new ServerError(404, `${req.method} ${req.path} not found`)));
 // the fourth argument is required although it's not used. Express won't use this error handler if the fourth arg is missing.
 app.use((error: ServerError, req: Request, res: Response, next: NextFunction) => res.status(error.status).json({ message: error.message, status: error.status }));
-app.listen(port, () => console.log(`Syncpipes Auto Client listening on port ${port}!`));
+app.listen(port, () => logger.info(`Syncpipes Auto Client listening on port ${port}!`));
