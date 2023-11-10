@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/mcflis/syncpipes-auto-client#readme",
   "dependencies": {
-    "axios": "0.19.0",
+    "axios": "1.6.0",
     "cron": "1.7.1",
     "express": "4.17.1",
     "winston": "3.2.1"
